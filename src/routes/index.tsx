@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUpRight, MoveRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HandoffArt, Idea } from "@/components/story-art";
 import { EventImage, VideoStage, eventArt } from "@/components/event-art";
+import { MobileMenu } from "@/components/mobile-menu";
 import beginning from "@/assets/beginning-world.jpg";
 import workshop from "@/assets/workshop-world.jpg";
 import connected from "@/assets/connected-world.jpg";
-import varaLogo from "@/assets/vara-logo.png.asset.json";
+import varaLogo from "@/assets/vara-logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -31,12 +32,21 @@ const scenes = [
 ];
 
 function Brand({ footer = false }: { footer?: boolean }) {
-  return <a className={`brand ${footer ? "brand-footer" : ""}`} href="#beginning" aria-label="VARA OFFSTAGE, back to the beginning"><img className="vara-logo" src={varaLogo.url} width={305} height={202} alt="Vara" /><span><span className="brand-divider" /><strong>[OFFSTAGE]</strong></span></a>;
+  return <a className={`brand ${footer ? "brand-footer" : ""}`} href="#beginning" aria-label="VARA OFFSTAGE, back to the beginning"><img className="vara-logo" src={varaLogo} width={305} height={202} alt="Vara" /><span><span className="brand-divider" /><strong>[OFFSTAGE]</strong></span></a>;
 }
 
 function Index() {
   const mainRef = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  useEffect(() => {
+    const onHashChange = () => setMenuOpen(false);
+    const onResize = () => { if (window.matchMedia("(min-width: 861px)").matches) setMenuOpen(false); };
+    window.addEventListener("hashchange", onHashChange);
+    window.addEventListener("resize", onResize);
+    return () => { window.removeEventListener("hashchange", onHashChange); window.removeEventListener("resize", onResize); };
+  }, []);
   useEffect(() => {
     const main = mainRef.current;
     if (!main) return;
@@ -58,6 +68,17 @@ function Index() {
         const progress = Math.max(0, Math.min(1, (window.innerHeight * 0.7 - rect.top) / (rect.height * 0.8)));
         section.style.setProperty("--scene-progress", String(reduced.matches ? 1 : progress));
         section.style.setProperty("--parallax", `${reduced.matches ? 0 : Math.max(-35, Math.min(35, -rect.top * 0.055))}px`);
+        if (section.id === "pass-it-on") {
+          const art = section.querySelector(".handoff-art");
+          const artRect = art?.getBoundingClientRect();
+          const handoff = reduced.matches ? 0.5 : artRect ? Math.max(0, Math.min(1, (window.innerHeight * 0.7 - artRect.top) / (artRect.height + window.innerHeight * 0.1))) : progress;
+          const leg = handoff < 0.5 ? handoff / 0.5 : (handoff - 0.5) / 0.5;
+          const x = handoff < 0.5 ? 32 + (68 - 32) * leg : 68 + (32 - 68) * leg;
+          const y = handoff < 0.5 ? 18 + (48 - 18) * leg : 48 + (78 - 48) * leg;
+          section.style.setProperty("--handoff-progress", String(handoff));
+          section.style.setProperty("--idea-x", `${x}%`);
+          section.style.setProperty("--idea-y", `${y}%`);
+        }
       });
       setActive(nearest);
     };
@@ -71,11 +92,13 @@ function Index() {
 
   return <>
     <a className="skip-link" href="#story-content">Skip to the story</a>
-    <header className="site-header">
+    <header className={`site-header ${menuOpen ? "menu-open" : ""}`}>
       <Brand />
-      <nav aria-label="Main navigation"><Button asChild variant="storyNav"><a href="#about">ABOUT</a></Button><Button asChild variant="storyNav"><a href="#pass-it-on">PASS IT ON <ArrowUpRight /></a></Button></nav>
-      <span className="coming-soon"><span />COMING SOON</span>
+      <nav className="desktop-nav" aria-label="Main navigation"><Button asChild variant="storyNav"><a href="#about">ABOUT</a></Button><Button asChild variant="storyNav"><a href="#pass-it-on">PASS IT ON <ArrowUpRight /></a></Button></nav>
+      <span className="coming-soon header-coming-soon"><span />COMING SOON</span>
+      <button type="button" className={`menu-toggle ${menuOpen ? "is-open" : ""}`} aria-expanded={menuOpen} aria-controls="mobile-menu" aria-label={menuOpen ? "Close menu" : "Open menu"} onClick={() => setMenuOpen(open => !open)}><span className="menu-bars" aria-hidden="true"><i /><i /></span></button>
     </header>
+    <MobileMenu open={menuOpen} onClose={closeMenu} />
     <main ref={mainRef} id="story-content">
       <section className="story-scene beginning is-visible" id="beginning" aria-labelledby="opening-heading">
         <img className="world-background" src={beginning} width="1536" height="1024" alt="A developer building beside a vast lavender portal, surrounded by floating islands and coral cliffs" fetchPriority="high" />
@@ -100,7 +123,7 @@ function Index() {
           { name: "EXPLORE", copy: "Discover projects, experiments and ideas.", art: eventArt.gathering, label: "The wider OFFSTAGE gathering, builders discovering ideas beneath the event banner", position: "center 35%" },
           { name: "SHARE", copy: "Exchange knowledge, experiences and lessons.", art: eventArt.sharing, label: "Two developers sharing something on a phone at OFFSTAGE", position: "center 30%" },
           { name: "CONNECT", copy: "Find people who can help you move forward.", art: eventArt.moments, label: "Builders connecting and exchanging ideas over their phones", position: "center 30%" },
-        ].map((concept, index) => <div className="concept reveal" key={concept.name}><div className="concept-visual"><img src={concept.art.url} alt={concept.label} loading="lazy" style={{ objectPosition: concept.position }} /></div><span className="concept-number">0{index + 1}</span><h3>{concept.name}<ArrowUpRight /></h3><p>{concept.copy}</p></div>)}</div>
+        ].map((concept, index) => <div className="concept reveal" key={concept.name}><div className="concept-visual"><img src={concept.art.src} srcSet={concept.art.srcSet} sizes="(max-width: 700px) 90vw, 33vw" alt={concept.label} loading="lazy" decoding="async" style={{ objectPosition: concept.position }} /></div><span className="concept-number">0{index + 1}</span><h3>{concept.name}<ArrowUpRight /></h3><p>{concept.copy}</p></div>)}</div>
         <div className="workshop-idea"><Idea /></div>
       </section>
 

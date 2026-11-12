@@ -28,6 +28,7 @@ export function HandoffArt() {
         <path className="connection-live" pathLength="1" d="M150 170Q320 0 500 170T850 170" />
         <circle className="connection-node" cx="150" cy="170" r="5" /><circle className="connection-node" cx="500" cy="170" r="5" /><circle className="connection-node" cx="850" cy="170" r="5" />
       </svg>
+      <svg className="connection-lines-mobile" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" aria-hidden="true"><path className="connection-ghost-mobile" pathLength="1" d="M31 14C62 22 72 38 72 52C72 66 31 72 31 86" vectorEffect="non-scaling-stroke" /><path className="connection-live-mobile" pathLength="1" d="M31 14C62 22 72 38 72 52C72 66 31 72 31 86" vectorEffect="non-scaling-stroke" /><circle className="connection-node-mobile" cx="31" cy="14" r="1.1" /><circle className="connection-node-mobile" cx="72" cy="52" r="1.1" /><circle className="connection-node-mobile" cx="31" cy="86" r="1.1" /></svg>
       <div className="builder-station station-one"><Builder /><span>A little discovery.</span></div>
       <div className="builder-station station-two"><Builder variant={1} /><span>A new possibility.</span></div>
       <div className="builder-station station-three"><Builder variant={2} /><span>And on it goes.</span></div>
