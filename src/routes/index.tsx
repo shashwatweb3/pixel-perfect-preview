@@ -9,6 +9,7 @@ import beginning from "@/assets/beginning-world.jpg";
 import workshop from "@/assets/workshop-world.jpg";
 import connected from "@/assets/connected-world.jpg";
 import varaLogo from "@/assets/vara-logo.png";
+import offstageFilm from "@/assets/offstage-film.mp4";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -149,7 +150,7 @@ function Index() {
       <section className="story-scene motion-scene" id="in-motion" aria-labelledby="motion-heading">
         <div className="star-field" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /><i /></div>
         <div className="scene-content motion-content reveal"><p className="eyebrow">05 — OFFSTAGE, IN MOTION</p><h2 id="motion-heading">THE ROOM. THE PEOPLE.<br />THE MOMENTS.</h2><p className="section-copy">A few moments from where the OFFSTAGE story began.</p></div>
-        <VideoStage poster={eventArt.gathering} />
+        <VideoStage src={offstageFilm} poster={eventArt.film} />
       </section>
 
       <section className="story-scene connection-scene" id="connection" aria-labelledby="connection-heading">

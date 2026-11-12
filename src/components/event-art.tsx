@@ -10,6 +10,8 @@ import gathering from "@/assets/offstage-gathering.webp";
 import gatheringSm from "@/assets/offstage-gathering-sm.webp";
 import moments from "@/assets/offstage-moments.webp";
 import momentsSm from "@/assets/offstage-moments-sm.webp";
+import filmPoster from "@/assets/offstage-film-poster.jpg";
+import filmPosterSm from "@/assets/offstage-film-poster-sm.jpg";
 
 export type EventArt = { src: string; srcSet: string };
 
@@ -25,6 +27,10 @@ export const eventArt = {
   sharing: art(sharing, sharingSm),
   gathering: art(gathering, gatheringSm),
   moments: art(moments, momentsSm),
+  film: {
+    src: filmPoster,
+    srcSet: `${filmPosterSm} 640w, ${filmPoster} 1280w`,
+  },
 };
 
 export function EventImage({
@@ -74,7 +80,7 @@ export function VideoStage({
     <div className="video-stage reveal">
       <div className="video-frame">
         {src ? (
-          <video controls preload="metadata" poster={poster.src} aria-label={title}>
+          <video controls playsInline preload="metadata" poster={poster.src} aria-label={title}>
             <source src={src} />
             Your browser does not support the video tag.
           </video>
