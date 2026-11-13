@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["server/**/*.ts", "src/world/**/*.ts", "src/components/world/layout.ts"],
+  "compilerOptions": {
+    "types": ["node"]
+  }
+}
