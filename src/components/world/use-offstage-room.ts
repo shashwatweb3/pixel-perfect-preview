@@ -6,7 +6,8 @@ import { OffstageState, type PlayerState } from "@/world/offstage-state";
 export type MultiplayerStatus = "connecting" | "connected" | "offline" | "error";
 export type MoveUpdate = { x: number; z: number; yaw: number; movement: "idle" | "walk" | "run" };
 
-const endpoint = import.meta.env.VITE_OFFSTAGE_WS_URL ?? "ws://127.0.0.1:2567";
+const endpoint =
+  import.meta.env.VITE_OFFSTAGE_WS_URL ?? (import.meta.env.DEV ? "ws://127.0.0.1:2567" : undefined);
 
 export function useOffstageRoom(displayName: string) {
   const roomRef = useRef<Room<unknown, OffstageState> | null>(null);
@@ -18,6 +19,12 @@ export function useOffstageRoom(displayName: string) {
 
   useEffect(() => {
     let cancelled = false;
+    if (!endpoint) {
+      setStatus("offline");
+      return () => {
+        cancelled = true;
+      };
+    }
     const client = new Client(endpoint);
     client
       .joinOrCreate("offstage_plaza", { displayName }, OffstageState)
